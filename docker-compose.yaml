@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  flaskapp:
+    build: .
+    container_name: flaskapp
+    restart: always
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "gunicorn 'scrape:app' --bind '0.0.0.0:8000'"
+    depends_on:
+      - redis
+    env_file:
+      - ./.env
+    networks:
+      - NBAGuessNetwork
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes: 
+      - redis:/data
+    networks:
+      - NBAGuessNetwork
+
+volumes:
+  redis:
+
+networks:
+  NBAGuessNetwork:
+    driver: bridge
