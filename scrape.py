@@ -10,6 +10,7 @@ from time import sleep
 import redis
 from flask import Flask, jsonify, render_template, request, session
 from flask_session import Session
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def get_team_urls() -> dict[str, str]:
@@ -90,6 +91,8 @@ app.config["SESSION_USE_SIGNER"] = True
 app.config["SESSION_REDIS"] = redis.from_url("redis://redis:6379")
 
 server_session = Session(app)
+
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 
 @app.route("/", methods=["GET", "POST"])
